@@ -63,19 +63,17 @@ Do dữ liệu chứa các giá trị khuyết thiếu và các kiểu dữ li�
 
 * **Kết quả:** Dữ liệu đầu ra của bước này là một ma trận hoàn toàn mang tính số học, không còn giá trị khuyết, sẵn sàng để đưa vào thuật toán.
 
-## 6. Chia dữ liệu và đánh giá cục bộ
+## 6. Chiến lược Đánh giá chéo (Stratified K-Fold Cross Validation)
 
-Để đảm bảo quá trình đánh giá mô hình khách quan và giảm thiểu rủi ro lệch phân phối dữ liệu, một chiến lược chia dữ liệu Train-Validation theo tỷ lệ 80/20 được áp dụng.
+Để ngăn chặn tối đa hiện tượng học vẹt (Overfitting) và tận dụng 100% lượng dữ liệu, chiến lược đánh giá K-Fold được áp dụng thay vì chỉ chia tách 80/20 một lần duy nhất.
 
-* **Phân hoạch mục tiêu:** Cột giá tiền được phân hoạch thành 20 khoảng dựa trên các phân vị. Kỹ thuật này đảm bảo số lượng mẫu trong mỗi khoảng phân hoạch là hoàn toàn tương đương nhau.
+*   **Phân hoạch mục tiêu & Chia Fold:** Cột giá tiền được chia thành 20 khoảng (bins) để làm mỏ neo phân tầng. Dữ liệu sau đó được chia đều thành **5 nếp gấp (5 Folds)**.
+*   **Logarithmic Transformation (Biến đổi Logarit):** Ở mỗi lượt huấn luyện, biến mục tiêu $y$ (giá tiền) được ép qua hàm `np.log1p` trước khi đưa vào thuật toán. Điều này giúp thu hẹp sự chênh lệch của các hợp đồng bảo hiểm giá trị cực đoan (Outliers), đồng thời đồng bộ hóa hoàn toàn hàm mục tiêu (MSE) của XGBoost với thang đo chấm điểm của cuộc thi (RMSLE).
+*   **Huấn luyện xoay vòng:** Hệ thống sẽ chạy 5 vòng lặp. Ở mỗi vòng, 4 nếp gấp được dùng để huấn luyện và nếp gấp còn lại dùng để thi thử (Validation). Kết thúc 5 vòng, toàn bộ 100% dữ liệu đều đã được đánh giá chéo (Out-of-Fold), tạo ra thước đo sát thực tế nhất.
 
-* **Chia dữ liệu:** Sử dụng 20 khoảng trên làm tiêu chí phân tầng. Cụ thể, hệ thống sẽ truy xuất vào **bên trong từng khoảng một** và thực hiện rút ngẫu nhiên đúng **80% số lượng mẫu để đưa vào tập huấn luyện (`X_train`, `y_train`), và 20% còn lại đưa vào tập kiểm thử cục bộ (`X_val`, `y_val`)**. Cơ chế chia này đảm bảo cấu trúc và phân phối giá tiền của tập Validation luôn là một bản sao thu nhỏ của tập Train ban đầu.
+## 7. Dự đoán & Kết xuất (Ensembling)
 
-* **Đánh giá:** Mô hình được huấn luyện trên tập 80% và kiểm thử trên tập 20% thông qua thang đo RMSLE. Tại bước này, các siêu tham số (Hyperparameters) như tốc độ học (`learning_rate`) hay độ sâu của cây (`max_depth`) được tinh chỉnh lặp đi lặp lại để tối ưu hóa điểm số.
+Quy trình dự đoán không dựa vào một mô hình đơn lẻ mà sử dụng chiến lược dự đoán tổ hợp (Blending).
 
-## 7. Huấn luyện trên toàn bộ tập dữ liệu
-
-Dùng kiến trúc mô hình tốt nhất sau khi xác định được bộ siêu tham số tối ưu thông qua quá trình đánh giá cục bộ.
-
-* **Huấn luyện toàn diện:** Mô hình XGBRegressor cuối cùng được huấn luyện lại trên **100%** tập dữ liệu ban đầu (`X` và `y`). Việc không giữ lại tập Validation ở bước này giúp mô hình tối đa hóa được lượng thông tin học hỏi.
-* **Xuất file CSV:** Mô hình sẽ tiếp nhận tập `X_test` đã qua tiền xử lý để đưa ra các dự đoán cuối cùng. Các kết quả dự đoán này sau đó được ghép nối với tập hợp `id` đã cất riêng ban đầu, và xuất ra tệp CSV có cấu trúc chuẩn khớp hoàn toàn với định dạng của `sample_submission.csv`.
+*   **Dự đoán tập thể:** Tại mỗi nếp gấp trong quá trình K-Fold, mô hình XGBoost hiện tại sẽ tiến hành giải đề trên tập `test.csv`. Các kết quả dự đoán (sau khi được dịch ngược logarit bằng hàm `np.expm1`) sẽ được lưu trữ lại.
+*   **Lấy Trung bình cộng (Averaging):** Kết quả cuối cùng là trung bình cộng của 5 bảng dự đoán từ 5 nếp gấp. Việc này đóng vai trò như một "hội đồng giám khảo", triệt tiêu các sai số ngẫu nhiên của từng cá nhân mô hình, mang lại một kết quả nộp bài ổn định và có tính tổng quát hóa cao nhất. Kết quả được lưu dưới định dạng `sample_submission.csv`.
