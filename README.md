@@ -57,13 +57,13 @@ Do dữ liệu chứa các giá trị khuyết thiếu và các kiểu dữ li�
 
 * **Kết quả:** Dữ liệu đầu ra của bước này là một ma trận hoàn toàn mang tính số học, không còn giá trị khuyết, sẵn sàng để đưa vào thuật toán.
 
-## 6. Chia Tách Phân tầng và Đánh giá Cục bộ (Stratified Split & Local Validation)
+## 6. Chia dữ liệu và đánh giá cục bộ
 
-Để đảm bảo quá trình đánh giá mô hình khách quan và giảm thiểu rủi ro lệch phân phối dữ liệu, một chiến lược chia tách Train-Validation theo tỷ lệ 80/20 được áp dụng.
+Để đảm bảo quá trình đánh giá mô hình khách quan và giảm thiểu rủi ro lệch phân phối dữ liệu, một chiến lược chia dữ liệu Train-Validation theo tỷ lệ 80/20 được áp dụng.
 
-* **Phân hoạch Mục tiêu (Target Binning):** Cột giá tiền (biến liên tục) được phân hoạch thành 20 khoảng (bins) dựa trên các phân vị. Kỹ thuật này đảm bảo số lượng mẫu trong mỗi khoảng phân hoạch là hoàn toàn tương đương nhau.
+* **Phân hoạch mục tiêu:** Cột giá tiền được phân hoạch thành 20 khoảng dựa trên các phân vị. Kỹ thuật này đảm bảo số lượng mẫu trong mỗi khoảng phân hoạch là hoàn toàn tương đương nhau.
 
-* **Phân tách Dữ liệu:** Sử dụng 20 khoảng trên làm tiêu chí phân tầng (stratify). Cụ thể, hệ thống sẽ truy xuất vào **bên trong từng khoảng một** và thực hiện rút ngẫu nhiên đúng **80% số lượng mẫu để đưa vào tập huấn luyện (`X_train`, `y_train`), và 20% còn lại đưa vào tập kiểm thử cục bộ (`X_val`, `y_val`)**. Cơ chế "chia để trị" này đảm bảo cấu trúc và phân phối giá tiền của tập Validation luôn là một bản sao thu nhỏ hoàn hảo của tập Train ban đầu.
+* **Chia dữ liệu:** Sử dụng 20 khoảng trên làm tiêu chí phân tầng. Cụ thể, hệ thống sẽ truy xuất vào **bên trong từng khoảng một** và thực hiện rút ngẫu nhiên đúng **80% số lượng mẫu để đưa vào tập huấn luyện (`X_train`, `y_train`), và 20% còn lại đưa vào tập kiểm thử cục bộ (`X_val`, `y_val`)**. Cơ chế chia này đảm bảo cấu trúc và phân phối giá tiền của tập Validation luôn là một bản sao thu nhỏ của tập Train ban đầu.
 
 * **Đánh giá:** Mô hình được huấn luyện trên tập 80% và kiểm thử trên tập 20% thông qua thang đo RMSLE. Tại bước này, các siêu tham số (Hyperparameters) như tốc độ học (`learning_rate`) hay độ sâu của cây (`max_depth`) được tinh chỉnh lặp đi lặp lại để tối ưu hóa điểm số.
 
