@@ -46,7 +46,7 @@ Tập dữ liệu chứa biến thời gian (`Policy Start Date`) mà các mô h
 
 Sau khi trích xuất, cột văn bản ngày tháng ban đầu sẽ bị xóa bỏ. Hàm biến đổi này được áp dụng đồng nhất cho cả tập Huấn luyện và tập Kiểm thử nhằm duy trì tính nhất quán về số lượng chiều dữ liệu.
 
-Ngoài việc phân rã biến thời gian (`Policy Start Date`) thành các cột số độc lập (Năm, Tháng, Ngày, Ngày trong tuần), hệ thống còn ứng dụng tư duy phân tích nghiệp vụ bảo hiểm (Domain Knowledge) để tạo ra các đặc trưng phức hợp, giúp mô hình bắt quy luật sâu hơn:
+Ngoài việc phân rã biến thời gian (`Policy Start Date`) thành các cột số độc lập (Năm, Tháng, Ngày, Ngày trong tuần), hệ thống còn tạo ra các đặc trưng phức hợp, giúp mô hình bắt quy luật sâu hơn:
 
 *   **Chỉ số Gánh nặng tài chính (`Income_per_Dependent`):** Thu nhập bình quân trên mỗi người phụ thuộc, phản ánh khả năng tài chính thực tế của khách hàng.
 *   **Tỷ lệ Rủi ro phương tiện (`Vehicle_Age_Ratio`):** Tương quan giữa độ tuổi xe và độ tuổi người lái, giúp nhận diện nhóm rủi ro cao (người trẻ lái xe cũ).
