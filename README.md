@@ -48,10 +48,10 @@ Sau khi trích xuất, cột văn bản ngày tháng ban đầu sẽ bị xóa b
 
 Ngoài việc phân rã biến thời gian (`Policy Start Date`) thành các cột số độc lập (Năm, Tháng, Ngày, Ngày trong tuần), hệ thống còn tạo ra các đặc trưng phức hợp, giúp mô hình bắt quy luật sâu hơn:
 
-*   **Chỉ số Gánh nặng tài chính (`Income_per_Dependent`):** Thu nhập bình quân trên mỗi người phụ thuộc, phản ánh khả năng tài chính thực tế của khách hàng.
-*   **Tỷ lệ Rủi ro phương tiện (`Vehicle_Age_Ratio`):** Tương quan giữa độ tuổi xe và độ tuổi người lái, giúp nhận diện nhóm rủi ro cao (người trẻ lái xe cũ).
-*   **Tần suất Bồi thường (`Claims_per_Year`):** Số lần yêu cầu bồi thường chia cho số năm tham gia, đo lường lịch sử lái xe chính xác hơn thay vì chỉ đếm số lần tai nạn thô.
-*   **Chỉ số Hao mòn Sức khỏe (`Health_Age_Index`):** Tương tác giữa điểm sức khỏe và tuổi tác, tạo ra hệ số rủi ro y tế kép.
+*   **Chỉ số Gánh nặng tài chính (`Income_per_Dependent`):** Được tính bằng tổng thu nhập chia cho số người phụ thuộc. Khách hàng có thu nhập $100.000 nhưng phải nuôi 4 người sẽ có rủi ro chi trả hoàn toàn khác một người độc thân có cùng mức thu nhập. Đặc trưng này giúp mô hình đánh giá đúng "độ dư dả tài chính" thực tế.
+*   **Tỷ lệ Rủi ro phương tiện (`Vehicle_Age_Ratio`):** Lấy tuổi của xe chia cho tuổi của người lái. Phép tính này tạo ra một mỏ neo cảnh báo rủi ro cực mạnh: Một thanh niên rất trẻ (non kinh nghiệm) lại điều khiển một chiếc xe rất cũ (dễ hỏng hóc) sẽ tạo ra xác suất tai nạn cao hơn rất nhiều so với người trung niên lái xe mới.
+*   **Tần suất Bồi thường (`Claims_per_Year`):** Số lần yêu cầu bồi thường chia cho số năm tham gia. Việc chỉ đếm số lần báo tai nạn thô là rất phiến diện (báo tai nạn 5 lần trong suốt 20 năm tham gia là rất an toàn, nhưng 5 lần chỉ trong 1 năm lại là thảm họa). Đặc trưng này đưa lịch sử rủi ro về cùng một hệ quy chiếu thời gian.
+*   **Chỉ số Hao mòn Sức khỏe (`Health_Age_Index`):** Nhân điểm sức khỏe với độ tuổi để tạo thành một hệ số rủi ro y tế kép (Interaction Feature). Nó giúp mô hình hiểu rằng: Cùng một mức điểm sức khỏe suy giảm, nhưng nếu rơi vào một người cao tuổi thì xác suất xảy ra biến chứng viện phí sẽ tăng theo cấp số nhân so với người trẻ.
 ## 5. Tiền xử lý
 
 Do dữ liệu chứa các giá trị khuyết thiếu và các kiểu dữ liệu phi số học, hệ thống sử dụng `ColumnTransformer` để định tuyến các đặc trưng qua các luồng xử lý chuyên biệt:
