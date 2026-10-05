@@ -52,7 +52,6 @@ Ngoài việc phân rã biến thời gian (`Policy Start Date`) thành các c�
 *   **Tỷ lệ Rủi ro phương tiện (`Vehicle_Age_Ratio`):** Tương quan giữa độ tuổi xe và độ tuổi người lái, giúp nhận diện nhóm rủi ro cao (người trẻ lái xe cũ).
 *   **Tần suất Bồi thường (`Claims_per_Year`):** Số lần yêu cầu bồi thường chia cho số năm tham gia, đo lường lịch sử lái xe chính xác hơn thay vì chỉ đếm số lần tai nạn thô.
 *   **Chỉ số Hao mòn Sức khỏe (`Health_Age_Index`):** Tương tác giữa điểm sức khỏe và tuổi tác, tạo ra hệ số rủi ro y tế kép.
-*   
 ## 5. Tiền xử lý
 
 Do dữ liệu chứa các giá trị khuyết thiếu và các kiểu dữ liệu phi số học, hệ thống sử dụng `ColumnTransformer` để định tuyến các đặc trưng qua các luồng xử lý chuyên biệt:
