@@ -27,7 +27,7 @@ Luồng xử lý phụ thuộc vào các thư viện lõi sau:
   * `OneHotEncoder`: Biến đổi các đặc trưng phân loại.
   * `mean_squared_log_error`: Thang đo đánh giá độ lỗi (RMSLE).
 
-## 3. Cấu hình Dữ liệu và Lựa chọn Đặc trưng
+## 3. Configuration
 
 Dữ liệu được nạp vào không gian làm việc thông qua Google Drive. Bước cấu hình sẽ cô lập các đặc trưng tính toán khỏi siêu dữ liệu (metadata) và biến mục tiêu.
 
