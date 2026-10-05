@@ -1,0 +1,12 @@
+# Bỏ qua các file dữ liệu (tránh lỗi quá dung lượng của GitHub)
+*.csv
+*.zip
+
+# Bỏ qua các file mô hình đã lưu
+*.joblib
+*.pkl
+*.h5
+
+# Bỏ qua các file rác của môi trường Jupyter/Python
+.ipynb_checkpoints/
+__pycache__/
