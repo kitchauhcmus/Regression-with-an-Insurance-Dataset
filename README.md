@@ -46,7 +46,7 @@ Tập dữ liệu chứa biến thời gian (`Policy Start Date`) mà các mô h
 
 Sau khi trích xuất, cột văn bản ngày tháng ban đầu sẽ bị xóa bỏ. Hàm biến đổi này được áp dụng đồng nhất cho cả tập Huấn luyện và tập Kiểm thử nhằm duy trì tính nhất quán về số lượng chiều dữ liệu.
 
-## 5. Chiến lược Tiền xử lý (Preprocessing Strategy)
+## 5. Tiền xử lý
 
 Do dữ liệu chứa các giá trị khuyết thiếu và các kiểu dữ liệu phi số học, hệ thống sử dụng `ColumnTransformer` để định tuyến các đặc trưng qua các luồng xử lý chuyên biệt:
 
