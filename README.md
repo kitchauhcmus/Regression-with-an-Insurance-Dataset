@@ -72,4 +72,4 @@ Do dữ liệu chứa các giá trị khuyết thiếu và các kiểu dữ li�
 Dùng kiến trúc mô hình tốt nhất sau khi xác định được bộ siêu tham số tối ưu thông qua quá trình đánh giá cục bộ.
 
 * **Huấn luyện toàn diện:** Mô hình XGBRegressor cuối cùng được huấn luyện lại trên **100%** tập dữ liệu ban đầu (`X` và `y`). Việc không giữ lại tập Validation ở bước này giúp mô hình tối đa hóa được lượng thông tin học hỏi.
-* **Nộp bài:** Mô hình sẽ tiếp nhận tập `X_test` đã qua tiền xử lý để đưa ra các dự đoán cuối cùng. Các kết quả dự đoán này sau đó được ghép nối với tập hợp `id` đã cất riêng ban đầu, và xuất ra tệp CSV có cấu trúc chuẩn khớp hoàn toàn với định dạng của `sample_submission.csv`.
+* **Xuất file CSV:** Mô hình sẽ tiếp nhận tập `X_test` đã qua tiền xử lý để đưa ra các dự đoán cuối cùng. Các kết quả dự đoán này sau đó được ghép nối với tập hợp `id` đã cất riêng ban đầu, và xuất ra tệp CSV có cấu trúc chuẩn khớp hoàn toàn với định dạng của `sample_submission.csv`.
