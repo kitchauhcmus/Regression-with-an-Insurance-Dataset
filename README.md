@@ -4,7 +4,7 @@
 
 Dự án này giải quyết bài toán Hồi quy (Regression) dựa trên Bộ dữ liệu Bảo hiểm từ cuộc thi **[Kaggle Playground Series - Season 4 Episode 12](https://www.kaggle.com/competitions/playground-series-s4e12)**. Mục tiêu của mô hình là dự đoán Phí bảo hiểm (`Premium Amount`) cho khách hàng dựa trên các thuộc tính của họ.
 
-Hệ sinh thái dữ liệu được cung cấp bao gồm ba thành phần chính:
+Dữ liệu được cung cấp bao gồm ba thành phần chính:
 
 * **Tập Huấn luyện (`train.csv`):** Bao gồm 21 cột (1 định danh `id`, 19 cột đặc trưng đầu vào, và 1 biến mục tiêu liên tục là `Premium Amount`).
 * **Tập Kiểm thử (`test.csv`):** Bao gồm 20 cột (cấu trúc đặc trưng giống hệt tập huấn luyện, nhưng không có biến mục tiêu).
