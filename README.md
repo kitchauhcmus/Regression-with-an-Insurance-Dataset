@@ -14,7 +14,7 @@ Dữ liệu được cung cấp bao gồm ba thành phần chính:
 
 Thuật toán lõi được lựa chọn cho bài toán hồi quy này là **XGBoost** (Extreme Gradient Boosting). Thuộc họ thuật toán học tập hợp (Ensemble Boosting), XGBoost xây dựng các cây quyết định một cách tuần tự, trong đó mỗi cây phía sau sẽ học hỏi và tối thiểu hóa sai số (residuals) của các cây phía trước.
 
-Luồng xử lý (Pipeline) phụ thuộc vào các thư viện lõi sau:
+Luồng xử lý phụ thuộc vào các thư viện lõi sau:
 
 * `xgboost`: Cung cấp mô hình hồi quy Gradient Boosting.
 * `pandas`: Sử dụng để thao tác, phân tích dữ liệu dạng bảng và DataFrame.
