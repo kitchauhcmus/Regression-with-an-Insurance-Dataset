@@ -1,8 +1,8 @@
-# Tài liệu Pipeline Machine Learning: Dự đoán Phí Bảo hiểm
+# Regression with an Insurance Dataset
 
-## 1. Tổng quan và Kiến trúc Dữ liệu
+## 1. Tổng quan bài toán và cấu trúc tập dữ liệu
 
-Dự án này giải quyết bài toán Hồi quy (Regression) dựa trên Bộ dữ liệu Bảo hiểm (từ nền tảng Kaggle). Mục tiêu của mô hình là dự đoán Phí bảo hiểm (`Premium Amount`) cho khách hàng dựa trên các thuộc tính của họ.
+Dự án này giải quyết bài toán Hồi quy (Regression) dựa trên Bộ dữ liệu Bảo hiểm từ cuộc thi **[Kaggle Playground Series - Season 4 Episode 12](https://www.kaggle.com/competitions/playground-series-s4e12)**. Mục tiêu của mô hình là dự đoán Phí bảo hiểm (`Premium Amount`) cho khách hàng dựa trên các thuộc tính của họ.
 
 Hệ sinh thái dữ liệu được cung cấp bao gồm ba thành phần chính:
 
