@@ -35,7 +35,7 @@ Dữ liệu được nạp vào không gian làm việc thông qua Google Drive.
 * **Vector Mục tiêu (y):** Cột `Premium Amount` từ tập huấn luyện.
 * *Lưu ý đối với tập Test:* Cột `id` trong tập kiểm thử được tách ra và lưu trữ riêng biệt, chỉ dùng để phục vụ việc ghép nối kết quả ở bước cuối cùng.
 
-## 4. Kỹ thuật Trích xuất Đặc trưng (Feature Engineering)
+## 4. Feature Engineering
 
 Tập dữ liệu chứa biến thời gian (`Policy Start Date`) mà các mô hình toán học không thể xử lý trực tiếp. Kỹ thuật trích xuất đặc trưng được áp dụng để phân rã biến này thành 4 đặc trưng số học độc lập:
 
