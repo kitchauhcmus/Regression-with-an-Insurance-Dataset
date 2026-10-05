@@ -61,13 +61,15 @@ Do dữ liệu chứa các giá trị khuyết thiếu và các kiểu dữ li�
 
 Để đảm bảo quá trình đánh giá mô hình khách quan và giảm thiểu rủi ro lệch phân phối dữ liệu, một chiến lược chia tách Train-Validation theo tỷ lệ 80/20 được áp dụng.
 
-* **Phân hoạch Mục tiêu (Target Binning):** Cột giá tiền (biến liên tục) được chia thành 20 khoảng (bins) dựa trên các phân vị, đảm bảo số lượng mẫu trong mỗi khoảng là tương đương nhau.
-* **Phân tách Dữ liệu:** Sử dụng 20 khoảng trên làm tiêu chí phân tầng (stratify), hệ thống tiến hành chia dữ liệu thành `X_train`, `X_val`, `y_train`, và `y_val`. Cơ chế này đảm bảo cấu trúc và phân phối giá tiền của tập Validation là một bản sao thu nhỏ hoàn hảo của tập Train.
+* **Phân hoạch Mục tiêu (Target Binning):** Cột giá tiền (biến liên tục) được phân hoạch thành 20 khoảng (bins) dựa trên các phân vị. Kỹ thuật này đảm bảo số lượng mẫu trong mỗi khoảng phân hoạch là hoàn toàn tương đương nhau.
+
+* **Phân tách Dữ liệu:** Sử dụng 20 khoảng trên làm tiêu chí phân tầng (stratify). Cụ thể, hệ thống sẽ truy xuất vào **bên trong từng khoảng một** và thực hiện rút ngẫu nhiên đúng **80% số lượng mẫu để đưa vào tập huấn luyện (`X_train`, `y_train`), và 20% còn lại đưa vào tập kiểm thử cục bộ (`X_val`, `y_val`)**. Cơ chế "chia để trị" này đảm bảo cấu trúc và phân phối giá tiền của tập Validation luôn là một bản sao thu nhỏ hoàn hảo của tập Train ban đầu.
+
 * **Đánh giá:** Mô hình được huấn luyện trên tập 80% và kiểm thử trên tập 20% thông qua thang đo RMSLE. Tại bước này, các siêu tham số (Hyperparameters) như tốc độ học (`learning_rate`) hay độ sâu của cây (`max_depth`) được tinh chỉnh lặp đi lặp lại để tối ưu hóa điểm số.
 
-## 7. Huấn luyện Toàn diện và Suy luận (Full Training & Inference)
+## 7. Huấn luyện trên toàn bộ tập dữ liệu
 
-Sau khi xác định được bộ siêu tham số tối ưu thông qua quá trình đánh giá cục bộ, kiến trúc mô hình được chốt lại.
+Dùng kiến trúc mô hình tốt nhất sau khi xác định được bộ siêu tham số tối ưu thông qua quá trình đánh giá cục bộ.
 
-* **Huấn luyện Toàn diện:** Mô hình XGBRegressor cuối cùng được huấn luyện lại trên **100%** tập dữ liệu ban đầu (`X` và `y`). Việc không giữ lại tập Validation ở bước này giúp mô hình tối đa hóa được lượng thông tin học hỏi.
-* **Suy luận & Nộp bài:** Mô hình sẽ tiếp nhận tập `X_test` đã qua tiền xử lý để đưa ra các dự đoán cuối cùng. Các kết quả dự đoán này sau đó được ghép nối với tập hợp `id` đã cất riêng ban đầu, và xuất ra tệp CSV có cấu trúc chuẩn khớp hoàn toàn với định dạng của `sample_submission.csv`.
+* **Huấn luyện toàn diện:** Mô hình XGBRegressor cuối cùng được huấn luyện lại trên **100%** tập dữ liệu ban đầu (`X` và `y`). Việc không giữ lại tập Validation ở bước này giúp mô hình tối đa hóa được lượng thông tin học hỏi.
+* **Nộp bài:** Mô hình sẽ tiếp nhận tập `X_test` đã qua tiền xử lý để đưa ra các dự đoán cuối cùng. Các kết quả dự đoán này sau đó được ghép nối với tập hợp `id` đã cất riêng ban đầu, và xuất ra tệp CSV có cấu trúc chuẩn khớp hoàn toàn với định dạng của `sample_submission.csv`.
