@@ -64,9 +64,7 @@ Do dữ liệu chứa các giá trị khuyết thiếu và các kiểu dữ li�
 
 ## 6. VALIDATION & XGBOOST
 
-Mô hình sử dụng chiến lược kiểm định Hold-out kết hợp phân tầng để đảm bảo tính đại diện của dữ liệu.
-
-* **Phân hoạch mục tiêu (Stratification):** Cột giá tiền được chia thành 20 khoảng (bins) để làm mỏ neo phân tầng. Dữ liệu sau đó được chia tách một lần duy nhất với tỷ lệ 80% cho tập Huấn luyện (Train) và 20% cho tập Kiểm thử (Validation) thông qua `train_test_split`.
+* **Chia dữ liệu:** Cột giá tiền được chia thành 20 khoảng (bins) để làm mỏ neo phân tầng. Dữ liệu sau đó được chia tách một lần duy nhất với tỷ lệ 80% cho tập Huấn luyện (Train) và 20% cho tập Kiểm thử (Validation) thông qua `train_test_split`.
 * **Logarithmic Transformation (Biến đổi Logarit):** Ở mỗi lượt huấn luyện, biến mục tiêu `y` (giá tiền) được ép qua hàm `np.log1p` trước khi đưa vào thuật toán. Điều này giúp thu hẹp sự chênh lệch của các hợp đồng bảo hiểm giá trị cực đoan (Outliers), đồng thời đồng bộ hóa hoàn toàn hàm mục tiêu (MSE) của XGBoost với thang đo chấm điểm của cuộc thi (RMSLE).
 * **Cấu hình GPU:** Quá trình kiểm định sử dụng mô hình `XGBRegressor` được kích hoạt tham số `tree_method='hist'` và `device='cuda'` để tận dụng tối đa sức mạnh tính toán song song của GPU trên nền tảng Kaggle.
 
