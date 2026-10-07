@@ -83,7 +83,6 @@ Sau khi tìm được cấu hình tối ưu và chứng minh tính hiệu quả 
 * **Định dạng đầu ra:** Các dự đoán hoàn chỉnh được ghép nối với cột `id` và xuất thẳng ra file `submission_final.csv`.
 
 
-## 8. Kết quả (Leaderboard Scores)
-
+## 8. Kết quả 
 * **Public Score:** 1.04534
 * **Private Score:** 1.04745
