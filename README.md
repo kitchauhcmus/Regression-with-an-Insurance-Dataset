@@ -29,7 +29,7 @@ Luồng xử lý phụ thuộc vào các thư viện lõi sau:
 
 ## 3. Configuration
 
-Dữ liệu được nạp vào không gian làm việc thông qua Google Drive. Bước cấu hình sẽ cô lập các đặc trưng tính toán khỏi siêu dữ liệu (metadata) và biến mục tiêu.
+Dữ liệu được nạp trực tiếp từ hệ thống lưu trữ của cuộc thi trên nền tảng Kaggle. Bước cấu hình sẽ cô lập các đặc trưng tính toán khỏi siêu dữ liệu (metadata) và biến mục tiêu.
 
 * **Không gian Đặc trưng (X):** Tập hợp 19 cột mang thông tin. Cột `id` và biến mục tiêu bị loại bỏ hoàn toàn khỏi không gian này để ngăn chặn hiện tượng rò rỉ dữ liệu (data leakage).
 * **Vector Mục tiêu (y):** Cột `Premium Amount` từ tập huấn luyện.
@@ -63,17 +63,23 @@ Do dữ liệu chứa các giá trị khuyết thiếu và các kiểu dữ li�
 
 * **Kết quả:** Dữ liệu đầu ra của bước này là một ma trận hoàn toàn mang tính số học, không còn giá trị khuyết, sẵn sàng để đưa vào thuật toán.
 
-## 6. Chiến lược Đánh giá chéo (Stratified K-Fold Cross Validation)
+## 6. Chiến lược Kiểm định (Hold-out Validation 80/20)
 
-Để ngăn chặn tối đa hiện tượng học vẹt (Overfitting) và tận dụng 100% lượng dữ liệu, chiến lược đánh giá K-Fold được áp dụng thay vì chỉ chia tách 80/20 một lần duy nhất.
+Mô hình sử dụng chiến lược kiểm định Hold-out kết hợp phân tầng để đảm bảo tính đại diện của dữ liệu.
 
-*   **Phân hoạch mục tiêu & Chia Fold:** Cột giá tiền được chia thành 20 khoảng (bins) để làm mỏ neo phân tầng. Dữ liệu sau đó được chia đều thành **5 nếp gấp (5 Folds)**.
-*   **Logarithmic Transformation (Biến đổi Logarit):** Ở mỗi lượt huấn luyện, biến mục tiêu $y$ (giá tiền) được ép qua hàm `np.log1p` trước khi đưa vào thuật toán. Điều này giúp thu hẹp sự chênh lệch của các hợp đồng bảo hiểm giá trị cực đoan (Outliers), đồng thời đồng bộ hóa hoàn toàn hàm mục tiêu (MSE) của XGBoost với thang đo chấm điểm của cuộc thi (RMSLE).
-*   **Huấn luyện xoay vòng:** Hệ thống sẽ chạy 5 vòng lặp. Ở mỗi vòng, 4 nếp gấp được dùng để huấn luyện và nếp gấp còn lại dùng để thi thử (Validation). Kết thúc 5 vòng, toàn bộ 100% dữ liệu đều đã được đánh giá chéo (Out-of-Fold), tạo ra thước đo sát thực tế nhất.
+* **Phân hoạch mục tiêu (Stratification):** Cột giá tiền được chia thành 20 khoảng (bins) để làm mỏ neo phân tầng. Dữ liệu sau đó được chia tách một lần duy nhất với tỷ lệ 80% cho tập Huấn luyện (Train) và 20% cho tập Kiểm thử (Validation) thông qua `train_test_split`.
+* **Logarithmic Transformation (Biến đổi Logarit):** Ở mỗi lượt huấn luyện, biến mục tiêu `y` (giá tiền) được ép qua hàm `np.log1p` trước khi đưa vào thuật toán. Điều này giúp thu hẹp sự chênh lệch của các hợp đồng bảo hiểm giá trị cực đoan (Outliers), đồng thời đồng bộ hóa hoàn toàn hàm mục tiêu (MSE) của XGBoost với thang đo chấm điểm của cuộc thi (RMSLE).
+* **Cấu hình GPU:** Quá trình kiểm định sử dụng mô hình `XGBRegressor` được kích hoạt tham số `tree_method='hist'` và `device='cuda'` để tận dụng tối đa sức mạnh tính toán song song của GPU trên nền tảng Kaggle.
 
-## 7. Dự đoán & Kết xuất (Ensembling)
+## 7. Full Training & Prediction
 
-Quy trình dự đoán không dựa vào một mô hình đơn lẻ mà sử dụng chiến lược dự đoán tổ hợp (Blending).
+Sau khi tìm được cấu hình siêu tham số (Hyperparameters) tối ưu trên tập Validation, luồng xử lý cuối cùng được thực hiện như sau:
 
-*   **Dự đoán tập thể:** Tại mỗi nếp gấp trong quá trình K-Fold, mô hình XGBoost hiện tại sẽ tiến hành giải đề trên tập `test.csv`. Các kết quả dự đoán (sau khi được dịch ngược logarit bằng hàm `np.expm1`) sẽ được lưu trữ lại.
-*   **Lấy Trung bình cộng (Averaging):** Kết quả cuối cùng là trung bình cộng của 5 bảng dự đoán từ 5 nếp gấp. Việc này đóng vai trò như một "hội đồng giám khảo", triệt tiêu các sai số ngẫu nhiên của từng cá nhân mô hình, mang lại một kết quả nộp bài ổn định và có tính tổng quát hóa cao nhất. Kết quả được lưu dưới định dạng `sample_submission.csv`.
+* **Huấn luyện 100% dữ liệu:** Mô hình XGBoost tốt nhất được khởi tạo lại và tiến hành học trên toàn bộ 100% dữ liệu gốc (`X_full`), tối đa hóa lượng thông tin đầu vào.
+* **Dự đoán:** Mô hình tiến hành giải đề trên tập `test.csv`. Các kết quả dự đoán sẽ được dịch ngược logarit bằng hàm `np.expm1` để trả về giá tiền thực tế.
+* **Định dạng đầu ra:** Kết quả dự đoán được ghép nối với cột `id` và xuất thẳng ra thư mục `/kaggle/working/` dưới dạng file `submission_final.csv`.
+
+## 8. Kết quả (Leaderboard Scores)
+
+* **Public Score:** 1.04534
+* **Private Score:** 1.04745
