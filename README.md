@@ -10,8 +10,7 @@ Dữ liệu được cung cấp bao gồm ba thành phần chính:
 * **Tập Kiểm thử (`test.csv`):** Bao gồm 20 cột (cấu trúc đặc trưng giống hệt tập huấn luyện, nhưng không có biến mục tiêu).
 * **Mẫu Nộp bài (`sample_submission.csv`):** Định dạng chuẩn yêu cầu để nộp bài, chỉ bao gồm đúng 2 cột: `id` và giá trị dự đoán `Premium Amount`.
 
-## 2. Kết nối các thư viện cần thiết
-
+## 2. Import Libraries
 Thuật toán lõi được lựa chọn cho bài toán hồi quy này là **XGBoost** (Extreme Gradient Boosting). Thuộc họ thuật toán học tập hợp (Ensemble Boosting), XGBoost xây dựng các cây quyết định một cách tuần tự, trong đó mỗi cây phía sau sẽ học hỏi và tối thiểu hóa sai số của các cây phía trước.
 
 Luồng xử lý phụ thuộc vào các thư viện lõi sau:
@@ -52,7 +51,7 @@ Ngoài việc phân rã biến thời gian (`Policy Start Date`) thành các c�
 *   **Tỷ lệ Rủi ro phương tiện (`Vehicle_Age_Ratio`):** Lấy tuổi của xe chia cho tuổi của người lái. Phép tính này tạo ra một mỏ neo cảnh báo rủi ro cực mạnh: Một thanh niên rất trẻ (non kinh nghiệm) lại điều khiển một chiếc xe rất cũ (dễ hỏng hóc) sẽ tạo ra xác suất tai nạn cao hơn rất nhiều so với người trung niên lái xe mới.
 *   **Tần suất Bồi thường (`Claims_per_Year`):** Số lần yêu cầu bồi thường chia cho số năm tham gia. Việc chỉ đếm số lần báo tai nạn thô là rất phiến diện (báo tai nạn 5 lần trong suốt 20 năm tham gia là rất an toàn, nhưng 5 lần chỉ trong 1 năm lại là thảm họa). Đặc trưng này đưa lịch sử rủi ro về cùng một hệ quy chiếu thời gian.
 *   **Chỉ số Hao mòn Sức khỏe (`Health_Age_Index`):** Nhân điểm sức khỏe với độ tuổi để tạo thành một hệ số rủi ro y tế kép (Interaction Feature). Nó giúp mô hình hiểu rằng: Cùng một mức điểm sức khỏe suy giảm, nhưng nếu rơi vào một người cao tuổi thì xác suất xảy ra biến chứng viện phí sẽ tăng theo cấp số nhân so với người trẻ.
-## 5. Tiền xử lý
+## 5. PREPROCESSOR
 
 Do dữ liệu chứa các giá trị khuyết thiếu và các kiểu dữ liệu phi số học, hệ thống sử dụng `ColumnTransformer` để định tuyến các đặc trưng qua các luồng xử lý chuyên biệt:
 
@@ -63,7 +62,7 @@ Do dữ liệu chứa các giá trị khuyết thiếu và các kiểu dữ li�
 
 * **Kết quả:** Dữ liệu đầu ra của bước này là một ma trận hoàn toàn mang tính số học, không còn giá trị khuyết, sẵn sàng để đưa vào thuật toán.
 
-## 6. Chiến lược Kiểm định (Hold-out Validation 80/20)
+## 6. VALIDATION & XGBOOST
 
 Mô hình sử dụng chiến lược kiểm định Hold-out kết hợp phân tầng để đảm bảo tính đại diện của dữ liệu.
 
@@ -71,7 +70,7 @@ Mô hình sử dụng chiến lược kiểm định Hold-out kết hợp phân 
 * **Logarithmic Transformation (Biến đổi Logarit):** Ở mỗi lượt huấn luyện, biến mục tiêu `y` (giá tiền) được ép qua hàm `np.log1p` trước khi đưa vào thuật toán. Điều này giúp thu hẹp sự chênh lệch của các hợp đồng bảo hiểm giá trị cực đoan (Outliers), đồng thời đồng bộ hóa hoàn toàn hàm mục tiêu (MSE) của XGBoost với thang đo chấm điểm của cuộc thi (RMSLE).
 * **Cấu hình GPU:** Quá trình kiểm định sử dụng mô hình `XGBRegressor` được kích hoạt tham số `tree_method='hist'` và `device='cuda'` để tận dụng tối đa sức mạnh tính toán song song của GPU trên nền tảng Kaggle.
 
-## 7. Full Training & Prediction
+## 7. Full Training & Export to CSV
 
 Sau khi tìm được cấu hình siêu tham số (Hyperparameters) tối ưu trên tập Validation, luồng xử lý cuối cùng được thực hiện như sau:
 
