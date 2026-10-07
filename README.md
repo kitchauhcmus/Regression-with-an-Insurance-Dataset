@@ -64,17 +64,24 @@ Do dữ liệu chứa các giá trị khuyết thiếu và các kiểu dữ li�
 
 ## 6. VALIDATION & XGBOOST
 
-* **Chia dữ liệu:** Cột giá tiền được chia thành 20 khoảng (bins) để làm mỏ neo phân tầng. Dữ liệu sau đó được chia tách một lần duy nhất với tỷ lệ 80% cho tập Huấn luyện (Train) và 20% cho tập Kiểm thử (Validation) thông qua `train_test_split`.
-* **Logarithmic Transformation (Biến đổi Logarit):** Ở mỗi lượt huấn luyện, biến mục tiêu `y` (giá tiền) được ép qua hàm `np.log1p` trước khi đưa vào thuật toán. Điều này giúp thu hẹp sự chênh lệch của các hợp đồng bảo hiểm giá trị cực đoan (Outliers), đồng thời đồng bộ hóa hoàn toàn hàm mục tiêu (MSE) của XGBoost với thang đo chấm điểm của cuộc thi (RMSLE).
-* **Cấu hình GPU:** Quá trình kiểm định sử dụng mô hình `XGBRegressor` được kích hoạt tham số `tree_method='hist'` và `device='cuda'` để tận dụng tối đa sức mạnh tính toán song song của GPU trên nền tảng Kaggle.
+* **Chia dữ liệu:** Thay vì chia cắt ngẫu nhiên 80/20 trên toàn bộ đám đông, hệ thống sắp xếp cột giá tiền và cắt thành 20 nhóm (bins) từ thấp đến cao[cite: 48]. Sau đó, thuật toán `train_test_split` sẽ chui vào *từng nhóm một*, trích ra đúng 80% cho tập Huấn luyện (Train) và 20% cho tập Kiểm thử (Validation)[cite: 48]. Kỹ thuật này đảm bảo phân phối giá tiền (tỷ lệ hợp đồng giá rẻ, trung bình, VIP) ở cả hai tập là giống hệt nhau, giúp mô hình được đánh giá một cách khách quan nhất.
+* **Logarithmic Transformation (Biến đổi Logarit):** Ở mỗi lượt huấn luyện, biến mục tiêu `y` (giá tiền) được ép qua hàm `np.log1p` trước khi đưa vào thuật toán[cite: 48, 49]. Điều này giúp làm "mềm" **các giá trị ngoại lai (Outliers)** hoặc các hợp đồng có mức phí đột biến, đồng thời đồng bộ hóa hoàn toàn hàm mục tiêu (MSE) của XGBoost với thang đo chấm điểm của cuộc thi (RMSLE)[cite: 48].
+* **Cấu hình Siêu tham số (Hyperparameters):** Mô hình XGBoost được tinh chỉnh với các tham số[cite: 49]:
+    * `n_estimators=1000` & `learning_rate=0.01`: Cấu hình sử dụng một lượng lớn cây quyết định (1000 cây) nhưng ép mô hình học với tốc độ bước tiến rất nhỏ (0.01)[cite: 49]. Điều này giúp mô hình hội tụ từ từ, tìm ra quy luật tinh tế nhất mà không bị "trượt" qua điểm tối ưu.
+    * `max_depth=8`: Giới hạn độ sâu (độ phức tạp) của mỗi cây ở mức 8 tầng để mô hình không ghi nhớ máy móc (học vẹt/Overfitting) dữ liệu nhiễu[cite: 49].
+    * `subsample=0.8` & `colsample_bytree=0.8`: Ở mỗi cây, hệ thống chỉ lấy ngẫu nhiên 80% lượng dữ liệu (khách hàng) và 80% số lượng đặc trưng (cột)[cite: 49]. Cơ chế này ép mô hình phải nhìn bài toán từ nhiều góc độ khác nhau thay vì phụ thuộc vào một vài cột hoặc một vài tệp khách hàng cố định.
+    * `min_child_weight=3`: Tăng tính bảo thủ cho mô hình; một quy luật chỉ được công nhận nếu nó được hỗ trợ bởi một lượng dữ liệu tối thiểu, giúp triệt tiêu các suy luận vô căn cứ[cite: 49].
+    * `objective="reg:squarederror"`: Sử dụng hàm mất mát bình phương tối thiểu (MSE) làm mục tiêu tối ưu[cite: 49].
+* **Cấu hình GPU:** Quá trình huấn luyện sử dụng tham số `tree_method='hist'` và `device='cuda'` để tận dụng tối đa sức mạnh tính toán song song của GPU trên nền tảng Kaggle[cite: 48, 49].
 
-## 7. Full Training & Export to CSV
+## 7. Huấn luyện toàn bộ & Kết xuất (Full Training & Prediction)
 
-Sau khi tìm được cấu hình siêu tham số (Hyperparameters) tối ưu trên tập Validation, luồng xử lý cuối cùng được thực hiện như sau:
+Sau khi tìm được cấu hình tối ưu và chứng minh tính hiệu quả qua tập Validation[cite: 49], luồng xử lý cuối cùng được thực hiện như sau:
 
-* **Huấn luyện 100% dữ liệu:** Mô hình XGBoost tốt nhất được khởi tạo lại và tiến hành học trên toàn bộ 100% dữ liệu gốc (`X_full`), tối đa hóa lượng thông tin đầu vào.
-* **Dự đoán:** Mô hình tiến hành giải đề trên tập `test.csv`. Các kết quả dự đoán sẽ được dịch ngược logarit bằng hàm `np.expm1` để trả về giá tiền thực tế.
-* **Định dạng đầu ra:** Kết quả dự đoán được ghép nối với cột `id` và xuất thẳng ra thư mục `/kaggle/working/` dưới dạng file `submission_final.csv`.
+* **Huấn luyện 100% dữ liệu:** Khởi tạo lại mô hình XGBoost với cấu hình xuất sắc nhất và tiến hành học trên toàn bộ 100% dữ liệu gốc (`X_full`), tối đa hóa lượng thông tin đầu vào.
+* **Dự đoán & Dịch ngược:** Mô hình tiến hành dự đoán trên tập `test.csv`[cite: 49]. Do biến mục tiêu đã bị ép qua biến đổi Logarit lúc học, các kết quả dự đoán này sẽ được dịch ngược về giá trị tiền tệ thực tế bằng hàm lũy thừa `np.expm1`[cite: 49].
+* **Kiểm soát giá trị âm (Clipping):** Hàm `np.clip(val_pred, 0, None)` được sử dụng như một chốt chặn an toàn cuối cùng, tự động ép mọi dự đoán rủi ro có giá trị âm trở về mức 0 (bởi vì phí bảo hiểm thực tế không thể nhỏ hơn 0)[cite: 49].
+* **Định dạng đầu ra:** Các dự đoán hoàn chỉnh được ghép nối với cột `id` và xuất thẳng ra file `submission_final.csv`.
 
 ## 8. Kết quả (Leaderboard Scores)
 
