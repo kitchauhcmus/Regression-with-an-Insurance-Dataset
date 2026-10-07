@@ -74,7 +74,7 @@ Do dữ liệu chứa các giá trị khuyết thiếu và các kiểu dữ li�
     * `objective="reg:squarederror"`: Sử dụng hàm mất mát bình phương tối thiểu (MSE) làm mục tiêu tối ưu.
 * **Cấu hình GPU:** Quá trình huấn luyện sử dụng tham số `tree_method='hist'` và `device='cuda'` để tận dụng tối đa sức mạnh tính toán song song của GPU trên nền tảng Kaggle.
 
-## 7. Huấn luyện toàn bộ & Kết xuất (Full Training & Prediction)
+## 7. Full Training
 
 Sau khi tìm được cấu hình tối ưu và chứng minh tính hiệu quả qua tập Validation, luồng xử lý cuối cùng được thực hiện như sau:
 
