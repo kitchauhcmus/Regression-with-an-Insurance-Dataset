@@ -80,7 +80,6 @@ Sau khi tìm được cấu hình tối ưu và chứng minh tính hiệu quả 
 
 * **Huấn luyện 100% dữ liệu:** Khởi tạo lại mô hình XGBoost với cấu hình xuất sắc nhất và tiến hành học trên toàn bộ 100% dữ liệu gốc (`X_full`), tối đa hóa lượng thông tin đầu vào.
 * **Dự đoán & Dịch ngược:** Mô hình tiến hành dự đoán trên tập `test.csv`. Do biến mục tiêu đã bị ép qua biến đổi Logarit lúc học, các kết quả dự đoán này sẽ được dịch ngược về giá trị tiền tệ thực tế bằng hàm lũy thừa `np.expm1`.
-* **Kiểm soát giá trị âm (Clipping):** Hàm `np.clip(val_pred, 0, None)` được sử dụng như một chốt chặn an toàn cuối cùng, tự động ép mọi dự đoán rủi ro có giá trị âm trở về mức 0 (bởi vì phí bảo hiểm thực tế không thể nhỏ hơn 0).
 * **Định dạng đầu ra:** Các dự đoán hoàn chỉnh được ghép nối với cột `id` và xuất thẳng ra file `submission_final.csv`.
 
 ## 7. Huấn luyện toàn bộ & Kết xuất (Full Training & Prediction)
